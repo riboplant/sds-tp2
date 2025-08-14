@@ -194,8 +194,8 @@ def sweep_eta_stationary(params: VicsekParams, etas, T: int = 1200, T_trans: int
     # Plot con barras de error
     fig, ax = plt.subplots(figsize=(7.0, 4.2))
     ax.errorbar(etas, va_mean, yerr=va_std, fmt='o-', capsize=4, linewidth=1.5)
-    ax.set_xlabel('Ruido $\eta$')
-    ax.set_ylabel('Orden estacionario $\langle v_a \rangle$')
+    ax.set_ylabel(r'Orden estacionario $\left< v_a \right>$')
+    ax.set_title(r'Orden estacionario vs. ruido $\eta$ (promedio sobre R realizaciones)')
     ax.set_title('Orden estacionario vs. ruido $\eta$ (promedio sobre R realizaciones)')
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
@@ -340,15 +340,33 @@ def sweep_density_stationary(
 
 
 if __name__ == "__main__":
-    seasonal_evolution_by_noise(N=300, L=7.0, r=1.0, v=0.03, eta_values=[0.1, 0.5, 1.0, 2.0], T=500)
+    seasonal_evolution_by_noise(N=300, L=7.0, r=1.0, v=0.03, eta_values=[0.1, 0.25, 0.5, 1.0, 2.0, 4.0], T=500)
     params = VicsekParams(N=300, L=7.0, r=1.0, v=0.03, eta=0.5, seed=1)
+    params2 = VicsekParams(N=50, L=10, r=1.0, v=0.03, eta=2, seed=1)
     animate_vicsek(params, T=300)
-    rhos = [0.2, 0.5, 1.0, 2.0]
+    animate_vicsek(params2, T=300)
+    rhos = [0.1, 0.25, 0.5, 1.0, 2.0]
     res_rho = sweep_density_stationary(
         params,
         rhos=rhos,
         T=1500,
         T_trans=300,
         R=5,
+        mode='vary_L',
+    )
+    sweep_density_stationary(
+        params,
+        rhos=rhos,
+        T=1500,
+        T_trans=300,
+        R=5,
         mode='vary_N',
+    )
+    etas = [0.2, 0.5, 1.0, 2.0, 4.0]
+    res_eta = sweep_eta_stationary(
+        params,
+        etas=etas,
+        T=1500,
+        T_trans=300,
+        R=5,
     )
