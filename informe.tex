@@ -1,0 +1,112 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{geometry}
+\usepackage{bm} % Para vectores en negrita
+\usepackage{siunitx} % Para unidades
+\usepackage{cite}
+
+\geometry{margin=2.5cm}
+
+\title{\textbf{Simulación del Modelo de Vicsek Off-Lattice}}
+\author{Nombre Apellido \\ Universidad \\ Materia: Sistemas de Simulación}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+En este trabajo se estudia el \textit{modelo de Vicsek off-lattice} \cite{vicsek1995novel}, un autómata celular continuo que describe el comportamiento colectivo de partículas autopropulsadas en dos dimensiones.  
+El objetivo es analizar la transición entre estados de desorden y orden colectivo en función de la densidad de partículas y la amplitud de ruido.
+
+\section{Modelo}
+El modelo considera $N$ partículas puntuales distribuidas en un dominio cuadrado de lado $L$ con condiciones periódicas.  
+Cada partícula $i$ posee una posición $\bm{x}_i(t)$ y una dirección $\theta_i(t)$ con módulo de velocidad fijo $v$.  
+
+En cada paso temporal:
+\begin{enumerate}
+    \item Se identifican los vecinos dentro de un radio $r$ (incluyendo la propia partícula).
+    \item Se calcula la dirección promedio:
+    \begin{equation}
+        \langle \theta(t) \rangle_r = \arctan2\left( \langle \sin(\theta(t)) \rangle_r, \langle \cos(\theta(t)) \rangle_r \right)
+        \label{eq:promedio}
+    \end{equation}
+    \item Se agrega ruido uniforme $\Delta\theta \in [-\eta/2, \eta/2]$:
+    \begin{equation}
+        \theta_i(t+1) = \langle \theta(t) \rangle_r + \Delta\theta
+        \label{eq:ruido}
+    \end{equation}
+    \item Se actualiza la posición:
+    \begin{equation}
+        \bm{x}_i(t+1) = \bm{x}_i(t) + v \cdot \begin{bmatrix} \cos(\theta_i(t+1)) \\ \sin(\theta_i(t+1)) \end{bmatrix}
+        \label{eq:posicion}
+    \end{equation}
+\end{enumerate}
+
+El grado de alineamiento se mide con el \textbf{parámetro de orden}:
+\begin{equation}
+    v_a = \frac{1}{N v} \left| \sum_{i=1}^N \bm{v}_i \right|
+    \label{eq:va}
+\end{equation}
+donde $v_a \approx 1$ indica orden total y $v_a \approx 0$ desorden.
+
+\section{Implementación}
+El modelo fue implementado en \texttt{Python}, empleando \texttt{numpy} para operaciones vectorizadas y \texttt{matplotlib} para visualización.  
+Se utilizó un algoritmo de búsqueda de vecinos de complejidad $O(N^2)$, suficiente para $N \lesssim 10^3$.
+
+\section{Metodología}
+Para obtener resultados estadísticamente confiables:
+\begin{itemize}
+    \item Se definieron parámetros iniciales $(N, L, r, v, \eta)$ y un número de iteraciones $T$.
+    \item Se descartaron las primeras $T_{\mathrm{trans}}$ iteraciones como \textit{transitorio}, de manera de medir solo el régimen estacionario.
+    \item Para cada conjunto de parámetros, se ejecutaron $R$ \textbf{realizaciones independientes} con condiciones iniciales aleatorias (posiciones y direcciones).
+    \item En cada realización se calculó el parámetro de orden $v_a(t)$ y se promedió sobre el régimen estacionario:
+    \begin{equation}
+        \langle v_a \rangle = \frac{1}{T_{\mathrm{med}}} \sum_{t=T_{\mathrm{trans}}+1}^{T} v_a(t)
+        \label{eq:promedio_va}
+    \end{equation}
+    donde $T_{\mathrm{med}} = T - T_{\mathrm{trans}}$.
+    \item El valor final reportado en gráficos de $\langle v_a \rangle$ vs. $\eta$ corresponde al promedio sobre $R$ realizaciones, y se incluyen barras de error calculadas como el desvío estándar.
+\end{itemize}
+
+\section{Simulaciones}
+Las simulaciones se realizaron variando la amplitud de ruido $\eta$ y, opcionalmente, la densidad $\rho = N/L^2$.  
+Cada configuración se ejecutó durante $T$ iteraciones, descartando las primeras como \textit{transitorio}, y se promediaron los resultados sobre $R$ realizaciones independientes para reducir fluctuaciones estadísticas.
+
+\section{Resultados y Conclusiones}
+En la Fig.~\ref{fig:va_vs_t} se observa la evolución temporal del parámetro de orden para $\eta = 0.1$, $N = 300$, $L = \SI{7}{m}$, $v = \SI{0.03}{m/s}$ y $r = \SI{1}{m}$.  
+El sistema alcanza rápidamente un estado de orden colectivo ($v_a \to 1$) debido al bajo ruido y alta densidad de vecinos.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{va_vs_t.png}
+    \caption{Evolución temporal del parámetro de orden $v_a$ según la Ec.~\eqref{eq:va}, para una única realización.}
+    \label{fig:va_vs_t}
+\end{figure}
+
+La Fig.~\ref{fig:va_vs_eta} muestra el valor promedio $\langle v_a \rangle$ en función de la amplitud de ruido $\eta$, promediado sobre $R$ realizaciones. Se aprecia una transición de fase de segundo orden entre estados ordenados y desordenados, con un valor crítico $\eta_c$ intermedio.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{va_vs_eta.png}
+    \caption{Parámetro de orden promedio $\langle v_a \rangle$ vs. ruido $\eta$, promediado sobre $R$ realizaciones. Barras de error: desvío estándar.}
+    \label{fig:va_vs_eta}
+\end{figure}
+
+En conclusión:
+\begin{itemize}
+    \item Para bajos valores de $\eta$, el sistema tiende rápidamente al orden colectivo global.
+    \item A medida que $\eta$ aumenta, se observa una pérdida gradual de alineamiento, hasta llegar a desorden completo.
+    \item La densidad $\rho$ influye en la posición de la transición, con mayores densidades favoreciendo el orden.
+\end{itemize}
+
+\section*{Referencias}
+\begin{thebibliography}{9}
+\bibitem{vicsek1995novel}
+T.~Vicsek, A.~Czirok, E.~Ben-Jacob, I.~Cohen, and O.~Shochet, ``Novel type of phase transition in a system of self-driven particles,'' \textit{Physical Review Letters}, vol.~75, no.~6, pp. 1226--1229, 1995.
+\end{thebibliography}
+
+\end{document}
