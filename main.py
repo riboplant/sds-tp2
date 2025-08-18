@@ -4,6 +4,7 @@ from typing import Tuple, Dict, Optional
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import vicsek
+from datetime import datetime
 
 # def seasonal_evolution_by_noise(N: int, L: float, r: float, v: float, eta_values: list, T: int = 1000):
 #     plt.figure(figsize=(8,6))
@@ -341,8 +342,15 @@ def animate_vicsek(filename: str, L: float, color_by_angle: bool = False):
     plt.tight_layout()
     plt.show()
 
-if __name__ == "__main__":
-    vicsek.simulate(vicsek.VicsekParams, T=100)
-    filename = "SDS/TP2/sds-tp2/data/vicsek_seed0_T10.npz"
-    animate_vicsek(filename, L=7.0, color_by_angle=False)
-    animate_vicsek(filename, L=7.0, color_by_angle=True)
+#if __name__ == "__main__":
+#    vicsek.simulate(vicsek.VicsekParams, T=100)
+#    filename = "SDS/TP2/sds-tp2/data/vicsek_seed0_T10.npz"
+#    animate_vicsek(filename, L=7.0, color_by_angle=False)
+#    animate_vicsek(filename, L=7.0, color_by_angle=True)
+
+timestamp = int(datetime.now().timestamp())
+params = vicsek.VicsekParams(seed=timestamp)
+vicsek.simulate(params, T=100)
+print("Nueva simulacion 'Off - Lattice' disponible")
+print(f"N = {params.N}, L = {params.L}, v = {params.v}, r = {params.r}, eta = {params.eta}")
+print(f"Timestamp de la simulacion: {timestamp}")
