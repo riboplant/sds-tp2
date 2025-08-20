@@ -342,15 +342,23 @@ def animate_vicsek(filename: str, L: float, color_by_angle: bool = False):
     plt.tight_layout()
     plt.show()
 
-#if __name__ == "__main__":
-#    vicsek.simulate(vicsek.VicsekParams, T=100)
-#    filename = "SDS/TP2/sds-tp2/data/vicsek_seed0_T10.npz"
-#    animate_vicsek(filename, L=7.0, color_by_angle=False)
-#    animate_vicsek(filename, L=7.0, color_by_angle=True)
-
 timestamp = int(datetime.now().timestamp())
 params = vicsek.VicsekParams(seed=timestamp)
-vicsek.simulate(params, T=100)
+N = input(f'Ingrese la cantidad de particulas N (default {params.N}): ')
+L = input(f'Ingrese la longitud de la grilla L (default {params.L}): ')
+r = input(f'Ingrese el radio de interaccion entre particulas r (default {params.r}): ')
+v = input(f'Ingrese el modulo de la velocidad de las particulas v (default {params.v}): ')
+eta = input(f'Ingrese \u03B7 (default {params.eta}): ')
+T = input('Ingrese la cantidad de frames T (default 300): ')
+params.N = params.N if N == "" else int(N)
+params.L = params.L if L == "" else float(L)
+params.r = params.r if r == "" else float(r)
+params.v = params.v if v == "" else float(v)
+params.eta = params.eta if eta == "" else float(eta)
+T = 300 if T == "" else int(T)
+
+states_xy, states_theta, _ = vicsek.simulate(params, T=T)
+vicsek.save_simulation(params, states_xy, states_theta)
 print("Nueva simulacion 'Off - Lattice' disponible")
 print(f"N = {params.N}, L = {params.L}, v = {params.v}, r = {params.r}, eta = {params.eta}")
 print(f"Timestamp de la simulacion: {timestamp}")

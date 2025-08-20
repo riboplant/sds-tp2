@@ -37,7 +37,7 @@ def dist_periodic(xy1, xy2, L):
 @dataclass
 class VicsekParams:
     N: int = 300
-    L: float = 7.0
+    L: float = 5.0
     r: float = 1.0
     v: float = 0.03
     eta: float = 0.1
@@ -159,29 +159,73 @@ def generate_dynamic_file(state: VicsekState, params: VicsekParams, directory: s
         for i in range(N):
             f.write(f"{xy[i][0]} {xy[i][1]} {theta[i]}\n")
 
-
-def simulate(params: VicsekParams, T: int = 1000) -> str:
-    N, L, v, r = params.N, params.L, params.v, params.r
-    directory = f"data/{params.seed}"
-    os.makedirs(directory, exist_ok=True)
-
+def simulate(params: VicsekParams, T: int = 300):
     rng = np.random.default_rng(params.seed)
     state = initialize(params)
     states_xy = [state.xy.copy()]
     states_theta = [state.theta.copy()]
     va_hist = [order_parameter(state.theta)]
-
-    static_file = os.path.join(directory, "static.txt")
-    with open(static_file, 'w') as f:
-        f.write(f"{N}\n{L}\n{v}\n{r}\n")
-        for i in range(0, N):
-            f.write("properties\n") # TODO: ver que propiedades ponemos aca para cada particula
-
-    generate_dynamic_file(state, params, directory, 0)
     
-    for t in range(1, T):
+    for _ in range(1, T):
         state = step(state, params, rng)
-        generate_dynamic_file(state, params, directory, t)
         states_xy.append(state.xy.copy())
         states_theta.append(state.theta.copy())
         va_hist.append(order_parameter(state.theta))
+
+    return states_xy, states_theta, va_hist
+
+def save_simulation(params, states_xy, states_theta):
+    T = len(states_xy)
+    directory = f"data/{params.seed}"
+    os.makedirs(directory, exist_ok=True)
+
+    static_file = os.path.join(directory, "static.txt")
+    with open(static_file, 'w') as f:
+        f.write(f"{params.N}\n{params.L}\n{params.v}\n{params.r}\n{params.eta}\n{T}\n")
+    
+    for t in range(T):
+        file = os.path.join(directory, f"{t}.txt")
+        xy = states_xy[t]
+        theta = states_theta[t]
+        with open(file, 'w') as f:
+            for i in range(params.N):
+                f.write(f"{xy[i][0]} {xy[i][1]} {theta[i]}\n")
+
+def key_name(name: str):
+    base = name[:-4].lower()  # quitar ".txt"
+    if base == "static":
+        return (1, float("inf"))
+    return (0, int(base))
+
+def process_simulation(timestamp: str):
+    directory = f"data/{timestamp}"
+    static_file = os.path.join(directory, "static.txt")
+    N, L, v, r, eta, T = 0, 0, 0, 0, 0, 0
+    with open(static_file, "r") as f:
+        N = int(f.readline())
+        L = float(f.readline())
+        v = float(f.readline())
+        r = float(f.readline())
+        eta = float(f.readline())
+        T = int(f.readline())
+
+    xy = []
+    theta = []
+    va_hist = []
+    for _, _, files in os.walk(directory):
+        files = sorted(files, key=key_name)
+        for name in files:
+            if name != "static.txt":
+                dynamic_file = os.path.join(directory, name)
+                xy_d = []
+                theta_d = []
+                with open(dynamic_file, "r") as f:
+                    for line in f:
+                        vals = line.strip().split(' ')
+                        xy_d.append([float(vals[0]), float(vals[1])])
+                        theta_d.append(float(vals[2]))
+                xy.append(np.asarray(xy_d))
+                theta.append(np.asarray(theta_d))
+                va_hist.append(order_parameter(theta_d))
+    
+    return N, L, v, r, eta, T, xy, theta, va_hist
