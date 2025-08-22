@@ -5,7 +5,7 @@ from matplotlib.animation import FuncAnimation
 import vicsek
 
 def animate_vicsek(xy_list, theta_list, va_hist, v: float, L: float, T: int, color_by_angle: bool = False):
-    fig, (ax_anim, ax_va) = plt.subplots(1, 2, figsize=(12, 6))
+    fig, (ax_anim, ax_va) = plt.subplots(1, 2, figsize=(20, 12))
     ax_anim.set_xlim(0, L)
     ax_anim.set_ylim(0, L)
     ax_anim.set_aspect('equal')
@@ -48,6 +48,6 @@ def animate_vicsek(xy_list, theta_list, va_hist, v: float, L: float, T: int, col
     plt.tight_layout()
     plt.show()
 
-timestamp = input("Ingrese la timestamp de la simulacion: ")
-N, L, v, r, eta, T, xy, theta, va_hist = vicsek.process_simulation(timestamp)
+simulation_name = input("Ingrese el nombre de la simulacion: ")
+N, L, v, r, eta, T, xy, theta, va_hist = vicsek.process_simulation(simulation_name)
 animate_vicsek(xy, theta, va_hist, v, L, T, True)

@@ -174,9 +174,9 @@ def simulate(params: VicsekParams, T: int = 300):
 
     return states_xy, states_theta, va_hist
 
-def save_simulation(params, states_xy, states_theta):
+def save_simulation(simulation_name, params, states_xy, states_theta):
     T = len(states_xy)
-    directory = f"data/{params.seed}"
+    directory = f"data/{simulation_name}"
     os.makedirs(directory, exist_ok=True)
 
     static_file = os.path.join(directory, "static.txt")
@@ -197,8 +197,8 @@ def key_name(name: str):
         return (1, float("inf"))
     return (0, int(base))
 
-def process_simulation(timestamp: str):
-    directory = f"data/{timestamp}"
+def process_simulation(simulation_name: str):
+    directory = f"data/{simulation_name}"
     static_file = os.path.join(directory, "static.txt")
     N, L, v, r, eta, T = 0, 0, 0, 0, 0, 0
     with open(static_file, "r") as f:
@@ -226,6 +226,5 @@ def process_simulation(timestamp: str):
                         theta_d.append(float(vals[2]))
                 xy.append(np.asarray(xy_d))
                 theta.append(np.asarray(theta_d))
-                va_hist.append(order_parameter(theta_d))
-    
+                va_hist.append(order_parameter(theta_d))    
     return N, L, v, r, eta, T, xy, theta, va_hist
