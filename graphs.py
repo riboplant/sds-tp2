@@ -46,9 +46,31 @@ def fixed_density(graph_name: str):
     plt.legend()
     plt.grid(True, alpha=0.3)
 
+def varied_density_eta_fixed(graph_name: str):
+    file = os.path.join(f"data/graphs/varied_density_eta_fixed", f"{graph_name}.txt")
+    L, eta = 0, 0
+    density = []
+    v_a = []
+    with open(file, 'r') as f:
+        for line in f:
+            vals = line.split(' ')
+            if L == 0:
+                L = float(vals[0])
+                eta = float(vals[1])
+            else:
+                density.append(float(vals[0]))
+                v_a.append(float(vals[1]))
+    plt.plot(density, v_a, marker="s", linestyle="None", label=f"L={L}, eta={eta}")
+    plt.title("Evolucion del $v_a$ promedio para distintas \u03C1 manteniendo fijo \u03B7")
+    plt.xlabel('\u03C1')
+    plt.ylabel("$v_a$ promedio")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+
 plt.figure(figsize=(12,12))
 graph_name = input("Ingrese el nombre del grafico: ")
 #seasonal_evolution_by_noise(graph_name)
 fixed_density(graph_name)
+#varied_density_eta_fixed(graph_name)
 plt.tight_layout()
 plt.show()
