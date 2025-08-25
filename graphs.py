@@ -69,8 +69,8 @@ def varied_density_eta_fixed(graph_name: str):
 
 plt.figure(figsize=(12,12))
 graph_name = input("Ingrese el nombre del grafico: ")
-#seasonal_evolution_by_noise(graph_name)
-fixed_density(graph_name)
+seasonal_evolution_by_noise(graph_name)
+#fixed_density(graph_name)
 #varied_density_eta_fixed(graph_name)
 plt.tight_layout()
 plt.show()

@@ -134,13 +134,13 @@ def step(state: VicsekState, params: VicsekParams, rng: np.random.Generator) -> 
     N, L, r_c, v, eta = params.N, params.L, params.r, params.v, params.eta
     noise = rng.uniform(-eta/2.0, eta/2.0, size=N)
     in_range = cell_index_method(state.xy, N, L, r_c)
-    mean_angle = []
+    mean_angle = np.empty(N, dtype=float)
     for i in range(N):
-        count = len(in_range[i])
-        sum = state.theta[i]
-        for j in range(count):
-            sum += state.theta[in_range[i][j]]
-        mean_angle.append(sum / (1 + count))
+        inds = [i] + in_range[i]
+        theta = state.theta[inds]
+        s = np.sin(theta).sum()
+        c = np.cos(theta).sum()
+        mean_angle[i] = np.arctan2(s, c)
     new_theta = mean_angle + noise
     vx = v * np.cos(new_theta)
     vy = v * np.sin(new_theta)

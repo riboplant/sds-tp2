@@ -130,5 +130,6 @@ def generate_varied_density_eta_fixed():
     simulations = simulations.split(',')
     varied_density_eta_fixed(graph_name, simulations)
 
-generate_fixed_density()
+generate_seasonal_evolution_by_noise()
+#generate_fixed_density()
 #generate_varied_density_eta_fixed()
