@@ -22,7 +22,7 @@ def animate_vicsek(xy_list, theta_list, va_hist, v: float, L: float, T: int, col
     scat = ax_anim.quiver(
         xy_list[0][:, 0], xy_list[0][:, 1],
         np.cos(theta_list[0]), np.sin(theta_list[0]),
-        angles='xy', scale_units='xy', scale=1/(v*10), width=0.005,
+        angles='xy', scale_units='xy', scale=1/(v*2), width=0.005,
         color=initial_colors if not color_by_angle else cmap(initial_colors / (2*np.pi))
     )
 

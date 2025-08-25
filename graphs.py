@@ -7,9 +7,9 @@ def seasonal_evolution_by_noise(graph_name: str):
     with open(file, 'r') as f:
         for line in f:
             vals = line.split(' ')
-            N, eta, _ = vals[:3]
-            va_hist = [float(x) for x in vals[3:]]
-            plt.plot(va_hist, label=f"N={N}, \u03B7={eta}")
+            N, L, eta, _ = vals[:4]
+            va_hist = [float(x) for x in vals[4:]]
+            plt.plot(va_hist, label=f"N={N}, L={L}, \u03B7={eta}")
     plt.title("Evolución temporal para distintos valores de ruido \u03B7")
     plt.xlabel("t")
     plt.ylabel("$v_a$")

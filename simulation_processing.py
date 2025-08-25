@@ -12,16 +12,16 @@ def seasonal_evolution_by_noise(graph_name: str, simulations: list[str]):
         for simulation in simulations:
             sim_directory = f"data/simulations/{simulation}"
             static_file = os.path.join(sim_directory, "static.txt")
-            N, eta, T = 0, 0, 0
+            N, L, eta, T = 0, 0, 0, 0
             with open(static_file, 'r') as f:
                 N = int(f.readline())
-                next(f)
+                L = float(f.readline())
                 next(f)
                 next(f)
                 eta = float(f.readline())
                 T = int(f.readline())
 
-            graph_f.write(f"{N} {eta} {T}")
+            graph_f.write(f"{N} {L} {eta} {T}")
 
             for _, _, files in os.walk(sim_directory):
                 files = sorted(files, key=vicsek.key_name)
