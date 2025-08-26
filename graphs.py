@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import os
+import vicsek
 
 def seasonal_evolution_by_noise(graph_name: str):
     file = os.path.join(f"data/graphs/seasonal_evolution_by_noise/{graph_name}.txt")
@@ -10,6 +10,10 @@ def seasonal_evolution_by_noise(graph_name: str):
             N, L, eta, _ = vals[:4]
             va_hist = [float(x) for x in vals[4:]]
             plt.plot(va_hist, label=f"N={N}, L={L}, \u03B7={eta}")
+            t0 = vicsek.t0_variance(va_hist)
+            if t0 != None:
+                plt.axvline(t0, linestyle="--", linewidth=1.0, alpha=0.7)
+                plt.text(t0, plt.ylim()[1]*0.05, f"t0 - N={N}, L={L}, eta={eta}", rotation=90, va="bottom", ha="right", fontsize=8)
     plt.title("Evolución temporal para distintos valores de ruido \u03B7")
     plt.xlabel("t")
     plt.ylabel("$v_a$")
