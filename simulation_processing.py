@@ -49,13 +49,14 @@ def fixed_density(graph_name: str, simulations: list[list[str]]):
             for simulation in sim_group:
                 sim_directory = f"data/simulations/{simulation}"
                 static_file = os.path.join(sim_directory, "static.txt")
-                eta = 0
+                eta, T = 0, 0
                 with open(static_file, 'r') as f:
                     N = int(f.readline())
                     L = float(f.readline())
                     next(f)
                     next(f)
                     eta = float(f.readline())
+                    T = int(f.readline())
                 if first:
                     first = False
                     graph_f.write(f"{N} {L} {len(sim_group)}\n")
@@ -63,7 +64,7 @@ def fixed_density(graph_name: str, simulations: list[list[str]]):
                 va_hist = []
                 for _, _, files in os.walk(sim_directory):
                     files = sorted(files, key=vicsek.key_name)
-                    for name in files:
+                    for name in files[int(0.3*T):]:
                         if name != "static.txt":
                             dynamic_file = os.path.join(sim_directory, name)
                             theta_d = []
@@ -72,7 +73,7 @@ def fixed_density(graph_name: str, simulations: list[list[str]]):
                                     vals = line.strip().split(' ')
                                     theta_d.append(float(vals[2]))
                             va_hist.append(vicsek.order_parameter(theta_d))
-                graph_f.write(f"{eta} {np.mean(va_hist)}\n")
+                graph_f.write(f"{eta} {np.mean(va_hist)} {np.std(va_hist, ddof=1)}\n")
 
 def varied_density_eta_fixed(graph_name: str, simulations: list[str]):
     graph_dir = f"data/graphs/varied_density_eta_fixed"
@@ -81,7 +82,7 @@ def varied_density_eta_fixed(graph_name: str, simulations: list[str]):
     graph_file = os.path.join(graph_dir, graph_name)
 
     with open(graph_file, 'w') as graph_f:
-        N, L, eta = 0, 0, 0
+        N, L, eta, T = 0, 0, 0, 0
         first = True
         for simulation in simulations:
             sim_directory = f"data/simulations/{simulation}"
@@ -92,13 +93,14 @@ def varied_density_eta_fixed(graph_name: str, simulations: list[str]):
                 next(f)
                 next(f)
                 eta = float(f.readline())
+                T = int(f.readline())
             if first:
                 first = False
                 graph_f.write(f"{L} {eta}\n")
             va_hist = []
             for _, _, files in os.walk(sim_directory):
                 files = sorted(files, key=vicsek.key_name)
-                for name in files:
+                for name in files[int(0.3*T):]:
                     if name != "static.txt":
                         dynamic_file = os.path.join(sim_directory, name)
                         theta_d = []
@@ -107,7 +109,7 @@ def varied_density_eta_fixed(graph_name: str, simulations: list[str]):
                                 vals = line.strip().split(' ')
                                 theta_d.append(float(vals[2]))
                         va_hist.append(vicsek.order_parameter(theta_d))
-            graph_f.write(f"{N/(L**2)} {np.mean(va_hist)}\n")
+            graph_f.write(f"{N/(L**2)} {np.mean(va_hist)} {np.std(va_hist, ddof=1)}\n")
 
 def generate_seasonal_evolution_by_noise():
     graph_name = input("Ingrese el nombre del grafico a generar: ")
@@ -130,6 +132,6 @@ def generate_varied_density_eta_fixed():
     simulations = simulations.split(',')
     varied_density_eta_fixed(graph_name, simulations)
 
-generate_seasonal_evolution_by_noise()
+#generate_seasonal_evolution_by_noise()
 #generate_fixed_density()
-#generate_varied_density_eta_fixed()
+generate_varied_density_eta_fixed()

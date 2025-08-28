@@ -30,31 +30,6 @@ def dist_periodic(xy1, xy2, L):
         dy -= L * round(dy / L)
         return math.sqrt(dx**2 + dy**2)
 
-def rolling_mean_var(x, W):
-    x = np.asarray(x, float)
-    cs = np.cumsum(np.insert(x, 0, 0.0))
-    cs2 = np.cumsum(np.insert(x*x, 0, 0.0))
-    m = (cs[W:] - cs[:-W]) / W
-    v = (cs2[W:] - cs2[:-W]) / W - m*m
-    return m, np.maximum(v, 0.0)
-
-def t0_variance(va, W=100, ref_frac=0.2, eps_var=0.10, eps_mu=0.02, M=5):
-    va = np.asarray(va, float)
-    m, v = rolling_mean_var(va, W)
-    L = len(v); tail = int(L*(1-ref_frac))
-    v_ref = np.median(v[tail:]); eps = 1e-12
-    ok_var = np.abs(v - v_ref) / max(v_ref, eps) < eps_var
-    m_prev = np.concatenate(([m[0]], m[:-1]))
-    ok_mu  = np.abs(m - m_prev) / np.maximum(np.abs(m_prev), eps) < eps_mu
-    ok = ok_var & ok_mu
-    run = 0
-    for i, flag in enumerate(ok):
-        run = run + 1 if flag else 0
-        if run >= M:
-            # t de la serie original: inicio de esa ventana
-            return max(0, i - M + 1)
-    return None
-
 # =============================
 # Modelo de Vicsek
 # =============================
