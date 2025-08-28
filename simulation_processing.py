@@ -100,7 +100,7 @@ def varied_density_eta_fixed(graph_name: str, simulations: list[str]):
             va_hist = []
             for _, _, files in os.walk(sim_directory):
                 files = sorted(files, key=vicsek.key_name)
-                for name in files[int(0.3*T):]:
+                for name in files[int(0.6*T):]:
                     if name != "static.txt":
                         dynamic_file = os.path.join(sim_directory, name)
                         theta_d = []

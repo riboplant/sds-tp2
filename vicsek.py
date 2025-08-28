@@ -41,6 +41,7 @@ class VicsekParams:
     r: float = 1.0
     v: float = 0.03
     eta: float = 0.1
+    voter: str = 'NO'
     seed: Optional[int] = 0
 
 @dataclass
@@ -131,17 +132,20 @@ def cell_index_method(xy, N, L, r_c):
     return res
 
 def step(state: VicsekState, params: VicsekParams, rng: np.random.Generator) -> VicsekState:
-    N, L, r_c, v, eta = params.N, params.L, params.r, params.v, params.eta
+    N, L, r_c, v, eta, voter = params.N, params.L, params.r, params.v, params.eta, params.voter
     noise = rng.uniform(-eta/2.0, eta/2.0, size=N)
     in_range = cell_index_method(state.xy, N, L, r_c)
-    mean_angle = np.empty(N, dtype=float)
+    angles = np.empty(N, dtype=float)
     for i in range(N):
         inds = [i] + in_range[i]
-        theta = state.theta[inds]
-        s = np.sin(theta).sum()
-        c = np.cos(theta).sum()
-        mean_angle[i] = np.arctan2(s, c)
-    new_theta = mean_angle + noise
+        if voter == 'SI':
+            angles[i] = state.theta[inds[rng.integers(0, len(inds))]]
+        else:
+            theta = state.theta[inds]
+            s = np.sin(theta).sum()
+            c = np.cos(theta).sum()
+            angles[i] = np.arctan2(s, c)
+    new_theta = angles + noise
     vx = v * np.cos(new_theta)
     vy = v * np.sin(new_theta)
     new_xy = wrap_periodic(state.xy + np.stack([vx, vy], axis=1), L)

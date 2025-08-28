@@ -4,16 +4,17 @@ import numpy as np
 
 def seasonal_evolution_by_noise(graph_name: str):
     file = os.path.join(f"data/graphs/seasonal_evolution_by_noise/{graph_name}.txt")
+    T = 0
     with open(file, 'r') as f:
         for line in f:
             vals = line.split(' ')
-            N, L, eta, _ = vals[:4]
+            N, L, eta, T = vals[:4]
             va_hist = [float(x) for x in vals[4:]]
             plt.plot(va_hist, label=f"N={N}, L={L}, \u03B7={eta}")
-    t0 = 0.3*len(va_hist)
+    t0 = 0.6*len(va_hist)
     plt.axvline(t0, linestyle="--", linewidth=1.0, alpha=0.7)
     plt.text(t0, plt.ylim()[1]*0.05, "t0", rotation=90, va="bottom", ha="right", fontsize=8)
-    plt.xticks(np.arange(0, 1001, 100))
+    plt.xticks(np.arange(0, int(T)+1, 100))
     plt.title("Evolución temporal para distintos valores de ruido \u03B7")
     plt.xlabel("t")
     plt.ylabel("$v_a$")
@@ -79,7 +80,7 @@ def varied_density_eta_fixed(graph_name: str):
 plt.figure(figsize=(12,12))
 graph_name = input("Ingrese el nombre del grafico: ")
 #seasonal_evolution_by_noise(graph_name)
-fixed_density(graph_name)
-#varied_density_eta_fixed(graph_name)
+#fixed_density(graph_name)
+varied_density_eta_fixed(graph_name)
 plt.tight_layout()
 plt.show()
