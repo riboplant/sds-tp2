@@ -338,3 +338,8 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,linux,python,pycharm+all
 
 *.pdf
+
+data
+
+own_bash_scripts
+*.zip
